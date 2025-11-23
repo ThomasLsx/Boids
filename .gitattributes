@@ -1,0 +1,4 @@
+# Auto-normalize line endings
+* text=auto
+*.py eol=lf
+README.md eol=lf
