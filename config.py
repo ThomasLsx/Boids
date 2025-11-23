@@ -15,15 +15,15 @@ VIOLET = (125, 60, 152)
 # Pygame initialization
 pygame.init()
 
-# Get screen resolution
-WINDOW_WIDTH, WINDOW_HEIGHT = pygame.display.get_desktop_sizes()[0]
+# Create a full-screen window first to get the correct resolution
+SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.SRCALPHA)
+
+# Get screen resolution from the created surface
+WINDOW_WIDTH, WINDOW_HEIGHT = SCREEN.get_size()
 
 # Font size (adapted to block size)
 taille_police = 25
 correcteur_police = (WINDOW_WIDTH + WINDOW_HEIGHT) // 2 / 1000
-
-# Create a full-screen window
-SCREEN = pygame.display.set_mode(flags=pygame.FULLSCREEN, depth=pygame.SRCALPHA)
 
 # Clock for managing FPS
 CLOCK = pygame.time.Clock()

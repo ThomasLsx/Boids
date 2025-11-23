@@ -1,4 +1,4 @@
-#credit.py
+# credit.py
 import pygame
 from ui import Text
 from config import quit_game, SCREEN, WINDOW_HEIGHT, WINDOW_WIDTH, WHITE, GREEN, CLOCK, correcteur_police
@@ -32,12 +32,12 @@ class Credits:
 
             # Display each line of text
             for i, line in enumerate(self.credits_text):
-                Text(line, WINDOW_WIDTH // 2, start_y + i * self.font_size * correcteur_police, WHITE, self.font_size).Draw()
+                Text(line, WINDOW_WIDTH // 2, start_y + i * self.font_size * correcteur_police, WHITE, self.font_size).draw()
 
             # Return button
             return_button = Text(
                 "Back", WINDOW_WIDTH // 2, WINDOW_HEIGHT - 100, GREEN, 50
-            ).Draw()
+            ).draw()
 
             # Update the display
             pygame.display.update()

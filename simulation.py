@@ -1,16 +1,16 @@
-# Simulation.py
+# simulation.py
 import pygame
-import random as rd
-from math import pi
-from Boids import Boid, Quadtree
+import numpy as np
+from math import pi, atan2, degrees
+from flock import Flock
 from ui import Button, Text, SliderButton
-from config import quit_game, SCREEN, CLOCK, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, BLACK, ORANGE, WHITE, BLUE, RED, GREEN
+from config import SCREEN, CLOCK, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, BLACK, ORANGE, WHITE, BLUE, RED, GREEN, quit_game
 
 # Boids initialization
 nbBoids = 100
 
 # Button creation
-button_labels = ["Back", "Reset", "Add", "Remove", "Pause", "Grid", "Zones"]
+button_labels = ["Back", "Reset", "Add", "Remove", "Pause", "Zones"] # Removed Grid
 buttons = []
 x_offset = 20
 y_offset_top = 20
@@ -46,88 +46,86 @@ for i, label in enumerate(slider_labels):
     sliders.append(slider)
 
 def run(return_to_menu):
-    global boids
+    global flock
 
     running = True
-    grid_active = True
     zone_on = False
 
-    # Boids initialization
-    boids = [Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(nbBoids)]
+    # Flock initialization
+    flock = Flock(nbBoids)
     
-    # Create the quadtree once outside the main loop
-    quadtree = Quadtree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, capacity=5, max_depth=6)
-
     while True:
         SCREEN.fill(BLACK)
 
         if running:
-            # Reset the quadtree (more efficient than recreating it)
-            quadtree.boids.clear()
-            quadtree.divided = False
+            # Get slider values
+            cohesion_val = sliders[0].get_value() * 2 
+            alignment_val = sliders[1].get_value() * 2
+            separation_val = sliders[2].get_value() * 0.5 
+            max_speed_val = sliders[3].get_value() * 0.05 
 
-            # Re-insert all boids
-            for boid in boids:
-                quadtree.insert(boid)
-
-            for boid in boids:
-                # Create the search rectangle once
-                search_radius = max(boid.vision, boid.separation_slider)
-                range_rect = pygame.Rect(
-                    boid.position.x - search_radius, 
-                    boid.position.y - search_radius, 
-                    search_radius * 2, 
-                    search_radius * 2
-                )
-                
-                # More efficiently search for nearby boids
-                nearby_boids = quadtree.query(range_rect)
-                
-                boid.apply_behaviors(nearby_boids)
-                boid.move()
-                boid.Draw()
-
-            if grid_active:
-                buttons[5] = Button("Grille", text_color=GREEN)
-                quadtree.Draw() 
-            else:
-                buttons[5] = Button("Grille", text_color=RED)
+            # Update flock
+            flock.update(cohesion_val, alignment_val, separation_val, max_speed_val)
+            flock.draw(SCREEN)
 
             if zone_on:
-                buttons[6] = Button("Zones", text_color=GREEN)
-                if len(boids) > 0:
-                    boid = boids[0]
-                    start_angle = -boid.vision_angle / 2
-                    end_angle = boid.vision_angle / 2
-                    direction_angle = boid.velocity.angle_to(pygame.math.Vector2(1, 0))
-                    if boid.separation_slider > 1:
-                        pygame.draw.arc(SCREEN, BLUE, (boid.position.x - boid.separation_slider, boid.position.y - boid.separation_slider, boid.separation_slider * 2, boid.separation_slider * 2), (start_angle + direction_angle) * pi / 180, (end_angle + direction_angle) * pi / 180, 2)
-                    if boid.alignment_slider > 1:
-                        pygame.draw.arc(SCREEN, RED, (boid.position.x - boid.alignment_slider, boid.position.y - boid.alignment_slider, boid.alignment_slider * 2, boid.alignment_slider * 2), (start_angle + direction_angle) * pi / 180, (end_angle + direction_angle) * pi / 180, 2)
-                        pygame.draw.line(SCREEN, ORANGE, boid.position, boid.position + 30 * boid.velocity, 2)
-                    if boid.cohesion_slider > 1:
-                        pygame.draw.arc(SCREEN, GREEN, (boid.position.x - boid.cohesion_slider, boid.position.y - boid.cohesion_slider, boid.cohesion_slider * 2, boid.cohesion_slider * 2), (start_angle + direction_angle) * pi / 180, (end_angle + direction_angle) * pi / 180, 2)
-                        pygame.draw.line(SCREEN, WHITE, boid.position, boid.point_cohe, 2)
-                        pygame.draw.circle(SCREEN, RED, boid.point_cohe, 5)
+                buttons[5] = Button("Zones", text_color=GREEN)
+                if flock.num_boids > 0:
+                    # Visualize for the first boid
+                    pos = flock.positions[0]
+                    vel = flock.velocities[0]
+                    
+                    # Calculate angle
+                    angle = atan2(vel[1], vel[0])
+                    start_angle = angle - np.radians(flock.vision_angle / 2)
+                    end_angle = angle + np.radians(flock.vision_angle / 2)
+                    
+                    # Pygame arc takes rectangle, start_angle, stop_angle
+                    # Angles are in radians, 0 is right, clockwise? No, standard trig usually but pygame is weird.
+                    # Pygame arc angles are in radians, 0 is right, counter-clockwise.
+                    # But we need to convert to degrees for logic if needed, or just use radians.
+                    # Wait, original code used degrees conversion: (start_angle + direction_angle) * pi / 180
+                    # Let's stick to radians since numpy uses radians.
+                    # Note: Pygame coordinate system y is down.
+                    
+                    # Draw Separation
+                    if separation_val > 1:
+                        rect = pygame.Rect(pos[0] - separation_val, pos[1] - separation_val, separation_val * 2, separation_val * 2)
+                        pygame.draw.arc(SCREEN, BLUE, rect, -end_angle, -start_angle, 2)
+                        
+                    # Draw Alignment
+                    if alignment_val > 1:
+                        rect = pygame.Rect(pos[0] - alignment_val, pos[1] - alignment_val, alignment_val * 2, alignment_val * 2)
+                        pygame.draw.arc(SCREEN, RED, rect, -end_angle, -start_angle, 2)
+                        # Draw velocity vector
+                        end_pos = pos + vel * 20 # Scale for visibility
+                        pygame.draw.line(SCREEN, ORANGE, pos, end_pos, 2)
+
+                    # Draw Cohesion
+                    if cohesion_val > 1:
+                        rect = pygame.Rect(pos[0] - cohesion_val, pos[1] - cohesion_val, cohesion_val * 2, cohesion_val * 2)
+                        pygame.draw.arc(SCREEN, GREEN, rect, -end_angle, -start_angle, 2)
+                        
+                        # Draw center of mass
+                        cohe_center = flock.cohesion_centers[0]
+                        pygame.draw.line(SCREEN, WHITE, pos, cohe_center, 2)
+                        pygame.draw.circle(SCREEN, RED, (int(cohe_center[0]), int(cohe_center[1])), 5)
             else:
-                buttons[6] = Button("Zones", text_color=RED)
+                buttons[5] = Button("Zones", text_color=RED)
 
         # Display "PAUSE" text if the simulation is paused
         buttons[4] = Button("Pause", text_color=RED)
         if not running:
-            for boid in boids:
-                boid.Draw()
-            if grid_active:
-                quadtree.Draw()
+            flock.draw(SCREEN)
             buttons[4] = Button("Pause", text_color=GREEN)
-            Text("PAUSE", WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, ORANGE, 70).Draw()
+            Text("PAUSE", WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, ORANGE, 70).draw()
 
         # Display buttons
         x_offset = 20
         for button in buttons[1:]:
-            button.draw(x=x_offset, y=y_offset_bottom)
+            button.draw(surface=SCREEN, x=x_offset, y=y_offset_bottom)
             x_offset += button.rect.width + margin
-        buttons[0].draw(x=20, y=y_offset_top)
+        buttons[0].draw(surface=SCREEN, x=20, y=y_offset_top)
 
         # Draw sliders
         for slider in sliders:
@@ -147,19 +145,6 @@ def run(return_to_menu):
 
                 elif event.type == pygame.MOUSEMOTION:
                     slider.handle_event(event)
-                    if slider.dragging:
-                        if i == 0:  # Cohesion
-                            for boid in boids:
-                                boid.cohesion_slider = boid.vision * slider.current_val / 100
-                        elif i == 1:  # Alignment
-                            for boid in boids:
-                                boid.alignment_slider = boid.vision * slider.current_val / 100
-                        elif i == 2:  # Separation
-                            for boid in boids:
-                                boid.separation_slider = boid.avoid_radius * slider.current_val / 100
-                        elif i == 3:  # Max Speed
-                            for boid in boids:
-                                boid.speed_slider = max(0.1, boid.max_speed * slider.current_val / 100)
 
             # Button handling
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -168,18 +153,14 @@ def run(return_to_menu):
                         if i == 0:  # Back
                             return_to_menu()
                         elif i == 1:  # Reset
-                            boids = [Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(nbBoids)]
+                            flock = Flock(nbBoids)
                         elif i == 2:  # Add
-                            if len(boids) + 25 <= 100000:  # Arbitrary limit
-                                boids.extend([Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(25)])
+                            flock.add_boids(25)
                         elif i == 3:  # Remove
-                            if len(boids) >= 25:
-                                del boids[-25:]
+                            flock.remove_boids(25)
                         elif i == 4:  # Pause
                             running = not running
-                        elif i == 5:  # Grid
-                            grid_active = not grid_active
-                        elif i == 6:  # Zones
+                        elif i == 5:  # Zones (index shifted because Grid removed)
                             zone_on = not zone_on
 
             if event.type == pygame.KEYDOWN:
@@ -188,12 +169,12 @@ def run(return_to_menu):
 
         # Display FPS and boid count
         Text(
-            f"~fps: {round(CLOCK.get_fps())}     ~Number of boids: {len(boids)}",
+            f"~fps: {round(CLOCK.get_fps())}     ~Number of boids: {flock.num_boids}",
             WINDOW_WIDTH // 2,
             30,
             color=ORANGE,
             taille=25,
-        ).Draw()
+        ).draw()
 
         pygame.display.update()
         CLOCK.tick(FPS)

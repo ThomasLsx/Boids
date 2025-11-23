@@ -17,14 +17,8 @@ def menu():
     ]
     selected = 0  # Index of the selected option
 
-    # Load and scale the background image (commented out)
-    # background_image = pygame.image.load("data/acceuil.jpeg").convert() # .convert() to optimize display
-    # background_image = pygame.transform.scale(background_image, (WINDOW_HEIGHT, WINDOW_WIDTH))
-    # background_image.set_alpha(150)
-
     while True:
         SCREEN.fill((0, 0, 0))  # Clear the screen
-        # SCREEN.blit(background_image, (0, 0)) # Display the background image (commented out)
 
         # Draw menu options
         option_rects = []  # List to store collision rectangles of the options
@@ -36,7 +30,7 @@ def menu():
                 (i + 1) * WINDOW_HEIGHT // (len(options) + 1),  # Dynamic y position based on the number of options
                 GREEN if selected == i else WHITE,  # Green if selected, otherwise white
                 50,  # Font size
-            ).Draw()  # Draw the text and return its collision rectangle
+            ).draw()  # Draw the text and return its collision rectangle
             option_rects.append(option_text)  # Add the rectangle to the list
 
         pygame.display.update()  # Update the display
