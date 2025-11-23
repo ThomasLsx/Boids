@@ -1,104 +1,67 @@
-**Boids**
+# Boids Simulation
 
-![CI](https://github.com/ThomasLsx/Boids/actions/workflows/python-ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-MIT-green)
+A Python implementation of Craig Reynolds' boids algorithm, simulating the flocking behavior of birds. This project uses Pygame for visualization and a Quadtree for efficient spatial partitioning.
 
-Description
-Le projet Boids est une simulation en Python des comportements collectifs (boids) basée sur l'approche de Craig Reynolds. L'affichage est fait avec Pygame.
+![Boids Simulation](https://upload.wikimedia.org/wikipedia/commons/2/29/Boids.gif)
 
-Fonctionnalités
-- Classe `Boid` : comportements (cohesion, separation, alignment, déplacement).
-- `Quadtree` : accélère les recherches spatiales.
-- Éléments UI : `Text`, `Button`, `SliderButton`.
+## Features
 
-Structure
-- `main.py` : menu principal et point d'entrée.
-- `simulation.py` : logique de la simulation.
-- `Boids.py` : classes `Boid` et `Quadtree`.
-- `ui.py` / `credit.py` / `config.py` : interface, crédits et configuration.
+- **Boid Agents**: Each boid follows three simple rules:
+    - **Cohesion**: Steer to move toward the average position of local flockmates.
+    - **Separation**: Steer to avoid crowding local flockmates.
+    - **Alignment**: Steer towards the average heading of local flockmates.
+- **Quadtree Optimization**: A Quadtree data structure is used to efficiently find boids in the local neighborhood of each agent, significantly improving performance.
+- **Interactive UI**: A simple user interface built with Pygame allows for real-time interaction with the simulation.
 
-Installation (recommandé : environnement virtuel)
-1. Créez et activez un environnement virtuel (Windows PowerShell) :
-```powershell
-python -m venv .venv
-.\\.venv\\Scripts\\Activate.ps1
-```
-2. Installez les dépendances :
-```powershell
-pip install -r requirements.txt
-```
+## How to Use
 
-Exécution
-```powershell
+The simulation provides several controls to manipulate the boids and their behavior:
+
+- **Add Boid**: Adds a new boid to the simulation.
+- **Remove Boid**: Removes the last added boid.
+- **Pause/Play**: Toggles the simulation between paused and running states.
+- **Show Quadtree**: Toggles the visualization of the Quadtree structure.
+- **Behavior Sliders**: Sliders are available to adjust the weights of the cohesion, separation, and alignment behaviors in real-time.
+
+## Installation
+
+It is recommended to use a virtual environment.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/ThomasLsx/Boids.git
+    cd Boids
+    ```
+
+2.  **Create and activate a virtual environment:**
+
+    -   **Windows (PowerShell):**
+        ```powershell
+        python -m venv .venv
+        .venv\Scripts\Activate.ps1
+        ```
+    -   **macOS/Linux (bash):**
+        ```bash
+        python3 -m venv .venv
+        source .venv/bin/activate
+        ```
+
+3.  **Install the dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+To run the simulation, execute the `main.py` script:
+
+```bash
 python main.py
 ```
 
-Licence
-Ce projet est sous licence MIT — voir le fichier `LICENSE`.
+## Credits
 
-Contribution
-Voir `CONTRIBUTING.md` pour les instructions de contribution et `CODE_OF_CONDUCT.md` pour le comportement attendu.
-
-Crédits
-- Antoine BARTCZAK
-- Lilian BRIAUT
-- Thomas LESIEUX
-# Projet Boids
-
-## Description
-Le projet Boids est une simulation de comportement de groupe d'oiseaux ou de poissons (boids) utilisant le modèle de Craig Reynolds
-pour les algorithmes de cohésion, séparation et alignement.
-Le projet est développé en Python avec la bibliothèque Pygame pour l'affichage graphique.
-
-## Fonctionnalités
-- **Boid class**: Gère les comportements individuels des boids.
-  - `in_vision_cone(other)`
-  - `cohesion(boids)`
-  - `separation(boids)`
-  - `alignment(boids)`
-  - `apply_force(force)`
-  - `apply_behaviors(boids)`
-  - `move()`
-  - `Draw()`
-
-- **Quadtree class**: Optimise la recherche spatiale pour les boids.
-  - `subdivide()`
-  - `insert(boid)`
-  - `query(range_rect)`
-  - `Draw()`
-
-- **UI Elements**: Composants graphiques pour l'interaction utilisateur.
-  - `Text`
-  - `Button`
-  - `SliderButton`
-
-## Configuration
-Le fichier `config.py` contient les paramètres de configuration et initialise Pygame, définit les couleurs, crée la fenêtre et gère les FPS.
-
-## Simulation
-Le fichier `simulation.py` contient la logique principale de la simulation, y compris la création des boutons et sliders, et la boucle principale de la simulation.
-
-## Menu Principal
-Le fichier `main.py` définit les fonctions pour le menu principal et le lancement de l'application.
-
-## Crédits
-Le fichier `credit.py` affiche les informations de crédit pour le projet.
-
-## Installation et Exécution
-1. Clonez le dépôt:
-    ```sh
-    git clone https://github.com/Bouhbou/Biods.git
-    ```
-2. Installez les dépendances requises:
-    ```sh
-    pip install pygame
-    ```
-3. Exécutez l'application:
-    ```sh
-    python main.py
-    ```
-
-## Contributeurs
+This project was created by:
 - Antoine BARTCZAK
 - Lilian BRIAUT
 - Thomas LESIEUX

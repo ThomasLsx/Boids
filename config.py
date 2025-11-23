@@ -2,7 +2,7 @@
 import pygame
 import sys
 
-# Définition des couleurs
+# Color definitions
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GRAY = (150, 150, 150)
@@ -12,24 +12,24 @@ GREEN = (0, 255, 0)
 ORANGE = (243, 156, 18)
 VIOLET = (125, 60, 152)
 
-# Initialisation de Pygame
+# Pygame initialization
 pygame.init()
 
-# Récupération de la résolution de l'écran
+# Get screen resolution
 WINDOW_WIDTH, WINDOW_HEIGHT = pygame.display.get_desktop_sizes()[0]
 
-# Taille de la police (adaptée à la taille des blocs)
+# Font size (adapted to block size)
 taille_police = 25
 correcteur_police = (WINDOW_WIDTH + WINDOW_HEIGHT) // 2 / 1000
 
-# Création de la fenêtre en plein écran
+# Create a full-screen window
 SCREEN = pygame.display.set_mode(flags=pygame.FULLSCREEN, depth=pygame.SRCALPHA)
 
-# Horloge pour gérer les FPS
+# Clock for managing FPS
 CLOCK = pygame.time.Clock()
 FPS = 120
 
-# Fonction pour quitter le jeu
+# Function to quit the game
 def quit_game(dummy_arg=None):
     pygame.quit()
     sys.exit()

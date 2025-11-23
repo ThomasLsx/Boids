@@ -5,62 +5,61 @@ from config import quit_game, SCREEN, WINDOW_HEIGHT, WINDOW_WIDTH, WHITE, GREEN,
 
 class Credits:
     def __init__(self):
-        # Texte des crédits
+        # Credits text
         self.credits_text = [
-            "Projet Boids",
+            "Boids Project",
             "",
-            "Développé par :",
+            "Developed by:",
             "BARTCZAK Antoine",
             "BRIAUT Lilian",
             "LESIEUX Thomas",
             
             "",
-            "École Polytech de l'Université de Dijon",
-            "Année 2024-2025",
+            "Polytech Dijon",
+            "Year 2024-2025",
         ]
-        self.taille = 30  # Taille de la police
+        self.font_size = 30  # Font size
 
     def run(self, return_to_menu):
         while True:
-            # Fond noir
+            # Black background
             SCREEN.fill((0, 0, 0))
 
-            # Calcul de la hauteur totale du bloc de texte
-            total_text_height = len(self.credits_text) * self.taille * correcteur_police
-            # Calcul de la coordonnée y de départ pour centrer le bloc de texte
+            # Calculate the total height of the text block
+            total_text_height = len(self.credits_text) * self.font_size * correcteur_police
+            # Calculate the starting y-coordinate to center the text block
             start_y = (WINDOW_HEIGHT - total_text_height) // 2
 
-            # Affichage de chaque ligne de texte
+            # Display each line of text
             for i, line in enumerate(self.credits_text):
-                Text(line, WINDOW_WIDTH // 2, start_y + i * self.taille * correcteur_police, WHITE, self.taille).Draw()
+                Text(line, WINDOW_WIDTH // 2, start_y + i * self.font_size * correcteur_police, WHITE, self.font_size).Draw()
 
-            # Bouton retour
+            # Return button
             return_button = Text(
-                "Retour", WINDOW_WIDTH // 2, WINDOW_HEIGHT - 100, GREEN, 50
+                "Back", WINDOW_WIDTH // 2, WINDOW_HEIGHT - 100, GREEN, 50
             ).Draw()
 
-            # Mise à jour de l'affichage
+            # Update the display
             pygame.display.update()
 
-            # Gestion des événements
+            # Event handling
             for event in pygame.event.get():
-                # Fermeture de la fenêtre
+                # Close the window
                 if event.type == pygame.QUIT:
                     quit_game()
-                # Clic de souris
+                # Mouse click
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    # Clic sur le bouton retour
+                    # Click on the return button
                     if return_button.collidepoint(event.pos):
                         return_to_menu()
-                # Appui sur une touche
+                # Key press
                 if event.type == pygame.KEYDOWN:
-                    # Touche Echap
+                    # Escape key
                     if event.key == pygame.K_ESCAPE:
                         return_to_menu()
-                    # Touche Entrée
+                    # Enter key
                     if event.key == pygame.K_RETURN:
                         return_to_menu()
 
-            # Limitation de la fréquence d'images
+            # Limit the frame rate
             CLOCK.tick(30)
-

@@ -2,32 +2,32 @@
 import pygame
 from config import BLACK, WHITE, taille_police, correcteur_police, SCREEN
 
-class Text:  # Classe pour afficher du texte à l'écran
+class Text:  # Class to display text on the screen
     def __init__(self, text, x, y, color=WHITE, taille=int(taille_police*correcteur_police), surface=SCREEN):
-        self.x = x  # Coordonnée x du centre du texte
-        self.y = y  # Coordonnée y du centre du texte
-        self.text = text  # Texte à afficher
-        self.color = color  # Couleur du texte
-        self.surface = surface  # Surface sur laquelle afficher le texte
-        self.font = pygame.font.SysFont(None, int(taille*correcteur_police))  # Police du texte
+        self.x = x  # x-coordinate of the center of the text
+        self.y = y  # y-coordinate of the center of the text
+        self.text = text  # Text to display
+        self.color = color  # Color of the text
+        self.surface = surface  # Surface on which to display the text
+        self.font = pygame.font.SysFont(None, int(taille*correcteur_police))  # Font of the text
 
     def Draw(self, surface=None):  # surface argument for flexibility
         if surface is None:
             surface = self.surface # Use default surface if none provided
 
-        text_obj = self.font.render(self.text, True, self.color)  # Rend le texte en tant qu'image
-        text_rect = text_obj.get_rect(center=(self.x, self.y))  # Crée un rectangle centré sur les coordonnées x et y
-        surface.blit(text_obj, text_rect)  # Dessine le texte sur la surface
-        return text_rect  # Retourne le rectangle du texte
+        text_obj = self.font.render(self.text, True, self.color)  # Render the text as an image
+        text_rect = text_obj.get_rect(center=(self.x, self.y))  # Create a rectangle centered on the x and y coordinates
+        surface.blit(text_obj, text_rect)  # Draw the text on the surface
+        return text_rect  # Return the rectangle of the text
 
 
 class Button:
     def __init__(self, text, color=WHITE, text_color=BLACK, padding=10, margin=5, font_size=None, surface=SCREEN):
-        self.text = text  # Texte du bouton
-        self.color = color  # Couleur du bouton
-        self.padding = padding  # Padding autour du texte
-        self.margin = margin  # Marge autour du bouton
-        self.font_size = font_size if font_size else taille_police # Utilise la taille de police globale si non spécifiée
+        self.text = text  # Text of the button
+        self.color = color  # Color of the button
+        self.padding = padding  # Padding around the text
+        self.margin = margin  # Margin around the button
+        self.font_size = font_size if font_size else taille_police # Use the global font size if not specified
 
         self.font = pygame.font.SysFont(None, int(self.font_size * correcteur_police))
         self.text_surface = self.font.render(self.text, True, text_color)
@@ -36,14 +36,14 @@ class Button:
 
 
     def draw(self, surface=SCREEN, x=0, y=0):
-        self.rect.topleft = (x, y)  # Définit la position avant de dessiner
+        self.rect.topleft = (x, y)  # Set the position before drawing
         pygame.draw.rect(surface, self.color, self.rect)
         text_rect = self.text_surface.get_rect(center=self.rect.center)
         surface.blit(self.text_surface, text_rect)
 
-    def handle_event(self, event, pos_override=None): # Ajout de l'argument pos_override
+    def handle_event(self, event, pos_override=None): # Added pos_override argument
         if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pos_override if pos_override else event.pos # Utilise la position surchargée si fournie
+            pos = pos_override if pos_override else event.pos # Use the overridden position if provided
             if self.rect.collidepoint(pos):
                 return True
         return False
@@ -51,41 +51,41 @@ class Button:
 
 class SliderButton:
     def __init__(self, x, y, width, height, min_val, max_val, current_val, text_color=BLACK, color=WHITE, text="", font_size=taille_police, surface=SCREEN):
-        self.x = x  # Coordonnée x du slider
-        self.y = y  # Coordonnée y du slider
-        self.width = width  # Largeur du slider
-        self.height = height  # Hauteur du slider
-        self.min_val = min_val  # Valeur minimale du slider
-        self.max_val = max_val  # Valeur maximale du slider
-        self.current_val = current_val  # Valeur actuelle du slider
-        self.color = color  # Couleur du slider
-        self.text = text  # Texte du slider
-        self.font_size = font_size  # Taille de la police
-        self.surface = surface  # Surface sur laquelle dessiner le slider
+        self.x = x  # x-coordinate of the slider
+        self.y = y  # y-coordinate of the slider
+        self.width = width  # Width of the slider
+        self.height = height  # Height of the slider
+        self.min_val = min_val  # Minimum value of the slider
+        self.max_val = max_val  # Maximum value of the slider
+        self.current_val = current_val  # Current value of the slider
+        self.color = color  # Color of the slider
+        self.text = text  # Text of the slider
+        self.font_size = font_size  # Font size
+        self.surface = surface  # Surface on which to draw the slider
 
-        self.dragging = False  # Indicateur de glissement
+        self.dragging = False  # Dragging indicator
         self.font = pygame.font.SysFont(None, int(self.font_size * correcteur_police))
         self.text_surface = self.font.render(self.text, True, text_color)
 
-        self.slider_rect = pygame.Rect(self.x, self.y + self.height, self.width, 10)  # Hauteur plus petite pour le slider
-        self.cursor_radius = 10  # Rayon du curseur
+        self.slider_rect = pygame.Rect(self.x, self.y + self.height, self.width, 10)  # Smaller height for the slider
+        self.cursor_radius = 10  # Radius of the cursor
         self.cursor_x = self.x + int((self.current_val - self.min_val) / (self.max_val - self.min_val) * self.width)
 
     
 
     def draw(self, bar_color = WHITE, cursor_color = BLACK):
-        # Dessine la barre du slider
+        # Draw the slider bar
         pygame.draw.rect(self.surface, bar_color, self.slider_rect)
 
-        # Dessine le curseur
+        # Draw the cursor
         pygame.draw.circle(self.surface, cursor_color, (self.cursor_x, self.slider_rect.centery), self.cursor_radius)
 
-        # Dessine le texte (si présent)
+        # Draw the text (if present)
         if self.text:
             text_rect = self.text_surface.get_rect(center=(self.x + self.width // 2, self.y + self.height//4 ))
             self.surface.blit(self.text_surface, text_rect)
         
-        # Dessine les valeurs
+        # Draw the values
         Text(f"{round(self.current_val)} %", self.x - 50, self.slider_rect[1], cursor_color, 20).Draw()
 
 

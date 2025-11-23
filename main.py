@@ -1,73 +1,73 @@
-# Importation des modules nécessaires
+# Import necessary modules
 import pygame
 import simulation
 from ui import Text
 from credit import Credits
 from config import quit_game, SCREEN, CLOCK, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, WHITE, GREEN
 
-# Fonction principale du menu
+# Main menu function
 def menu():
-    credits_use = Credits()  # Instance de la classe Credits
+    credits_use = Credits()  # Instance of the Credits class
     
-    # Options du menu : texte affiché et action associée
+    # Menu options: displayed text and associated action
     options = [
-        ("Simulation", simulation.run),  # Option pour lancer la simulation
-        ("Crédits", credits_use.run),  # Option pour afficher les crédits
-        ("Quitter", quit_game),  # Option pour quitter le jeu
+        ("Simulation", simulation.run),  # Option to launch the simulation
+        ("Credits", credits_use.run),  # Option to display credits
+        ("Quit", quit_game),  # Option to quit the game
     ]
-    selected = 0  # Index de l'option sélectionnée
+    selected = 0  # Index of the selected option
 
-    # Chargement et mise à l'échelle de l'image de fond (commenté)
-    # background_image = pygame.image.load("data/acceuil.jpeg").convert() # .convert() pour optimiser l'affichage
+    # Load and scale the background image (commented out)
+    # background_image = pygame.image.load("data/acceuil.jpeg").convert() # .convert() to optimize display
     # background_image = pygame.transform.scale(background_image, (WINDOW_HEIGHT, WINDOW_WIDTH))
     # background_image.set_alpha(150)
 
     while True:
-        SCREEN.fill((0, 0, 0))  # Efface l'écran
-        # SCREEN.blit(background_image, (0, 0)) # Affiche l'image de fond (commenté)
+        SCREEN.fill((0, 0, 0))  # Clear the screen
+        # SCREEN.blit(background_image, (0, 0)) # Display the background image (commented out)
 
-        # Dessiner les options de menu
-        option_rects = []  # Liste pour stocker les rectangles de collision des options
-        for i, (text, action) in enumerate(options):  # Itère sur les options
-            # Crée un objet Text pour chaque option et le dessine
+        # Draw menu options
+        option_rects = []  # List to store collision rectangles of the options
+        for i, (text, action) in enumerate(options):  # Iterate over the options
+            # Create a Text object for each option and draw it
             option_text = Text(
-                text,  # Texte de l'option
-                WINDOW_WIDTH // 2,  # Position x centrée
-                (i + 1) * WINDOW_HEIGHT // (len(options) + 1),  # Position y dynamique en fonction du nombre d'options
-                GREEN if selected == i else WHITE,  # Couleur verte si sélectionnée, blanche sinon
-                50,  # Taille de la police
-            ).Draw()  # Dessine le texte et retourne son rectangle de collision
-            option_rects.append(option_text)  # Ajoute le rectangle à la liste
+                text,  # Text of the option
+                WINDOW_WIDTH // 2,  # Centered x position
+                (i + 1) * WINDOW_HEIGHT // (len(options) + 1),  # Dynamic y position based on the number of options
+                GREEN if selected == i else WHITE,  # Green if selected, otherwise white
+                50,  # Font size
+            ).Draw()  # Draw the text and return its collision rectangle
+            option_rects.append(option_text)  # Add the rectangle to the list
 
-        pygame.display.update()  # Met à jour l'affichage
+        pygame.display.update()  # Update the display
 
-        # Gestion des événements
+        # Event handling
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Fermeture de la fenêtre
+            if event.type == pygame.QUIT:  # Window closed
                 quit_game()
 
-            if event.type == pygame.KEYDOWN:  # Appui d'une touche
-                if event.key == pygame.K_ESCAPE:  # Touche Echap
+            if event.type == pygame.KEYDOWN:  # Key press
+                if event.key == pygame.K_ESCAPE:  # Escape key
                     quit_game()
-                if event.key == pygame.K_DOWN:  # Flèche bas
-                    selected = (selected + 1) % len(options)  # Sélectionne l'option suivante
-                elif event.key == pygame.K_UP:  # Flèche haut
-                    selected = (selected - 1) % len(options)  # Sélectionne l'option précédente
-                elif event.key == pygame.K_RETURN:  # Touche Entrée
-                    options[selected][1](None if selected == 2 else menu)  # Exécute l'action associée à l'option sélectionnée
+                if event.key == pygame.K_DOWN:  # Down arrow
+                    selected = (selected + 1) % len(options)  # Select the next option
+                elif event.key == pygame.K_UP:  # Up arrow
+                    selected = (selected - 1) % len(options)  # Select the previous option
+                elif event.key == pygame.K_RETURN:  # Enter key
+                    options[selected][1](None if selected == 2 else menu)  # Execute the action associated with the selected option
 
-            if event.type == pygame.MOUSEBUTTONDOWN:  # Clic de souris
-                for i, option_rect in enumerate(option_rects):  # Itère sur les rectangles de collision
-                    if option_rect.collidepoint(event.pos):  # Vérifie si le clic est sur une option
-                        options[i][1](None if options[i][1] == quit_game else menu)  # Exécute l'action, passe menu à simulation.run si nécessaire
-                        break  # Sort de la boucle après un clic
+            if event.type == pygame.MOUSEBUTTONDOWN:  # Mouse click
+                for i, option_rect in enumerate(option_rects):  # Iterate over the collision rectangles
+                    if option_rect.collidepoint(event.pos):  # Check if the click is on an option
+                        options[i][1](None if options[i][1] == quit_game else menu)  # Execute the action, pass menu to simulation.run if necessary
+                        break  # Exit the loop after a click
 
-        CLOCK.tick(FPS)  # Limite la fréquence de rafraîchissement
+        CLOCK.tick(FPS)  # Limit the refresh rate
 
-# Fonction principale du programme
+# Main function of the program
 def main():
-    menu()  # Lance le menu
+    menu()  # Launch the menu
 
-# Point d'entrée du programme
+# Entry point of the program
 if __name__ == "__main__":
-    main()  # Exécute la fonction main si le script est exécuté directement
+    main()  # Execute the main function if the script is executed directly

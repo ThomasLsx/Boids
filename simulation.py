@@ -6,11 +6,11 @@ from Boids import Boid, Quadtree
 from ui import Button, Text, SliderButton
 from config import quit_game, SCREEN, CLOCK, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, BLACK, ORANGE, WHITE, BLUE, RED, GREEN
 
-# Initialisation des boids
+# Boids initialization
 nbBoids = 100
 
-# Création des boutons
-button_labels = ["Retour", "Reset", "Ajouter", "Retirer", "Pause", "Grille", "Zones"]
+# Button creation
+button_labels = ["Back", "Reset", "Add", "Remove", "Pause", "Grid", "Zones"]
 buttons = []
 x_offset = 20
 y_offset_top = 20
@@ -21,8 +21,8 @@ for label in button_labels:
     button = Button(label)
     buttons.append(button)
 
-# Création des sliders
-slider_labels = ["Cohésion", "Alignement", "Distanciation", "Vitesse Max"]
+# Slider creation
+slider_labels = ["Cohesion", "Alignment", "Separation", "Max Speed"]
 sliders = []
 slider_x = WINDOW_WIDTH - 235
 slider_y_start = 20
@@ -52,26 +52,26 @@ def run(return_to_menu):
     grid_active = True
     zone_on = False
 
-    # Initialisation des boids
+    # Boids initialization
     boids = [Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(nbBoids)]
     
-    # Créer le quadtree une seule fois en dehors de la boucle principale
+    # Create the quadtree once outside the main loop
     quadtree = Quadtree(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, capacity=5, max_depth=6)
 
     while True:
         SCREEN.fill(BLACK)
 
         if running:
-            # Réinitialiser le quadtree (plus efficace que de le recréer)
+            # Reset the quadtree (more efficient than recreating it)
             quadtree.boids.clear()
             quadtree.divided = False
 
-            # Réinsérer tous les boids
+            # Re-insert all boids
             for boid in boids:
                 quadtree.insert(boid)
 
             for boid in boids:
-                # Créer le rectangle de recherche une seule fois
+                # Create the search rectangle once
                 search_radius = max(boid.vision, boid.separation_slider)
                 range_rect = pygame.Rect(
                     boid.position.x - search_radius, 
@@ -80,7 +80,7 @@ def run(return_to_menu):
                     search_radius * 2
                 )
                 
-                # Rechercher les boids à proximité de manière plus efficace
+                # More efficiently search for nearby boids
                 nearby_boids = quadtree.query(range_rect)
                 
                 boid.apply_behaviors(nearby_boids)
@@ -112,7 +112,7 @@ def run(return_to_menu):
             else:
                 buttons[6] = Button("Zones", text_color=RED)
 
-        # Affichage du texte "PAUSE" si la simulation est en pause
+        # Display "PAUSE" text if the simulation is paused
         buttons[4] = Button("Pause", text_color=RED)
         if not running:
             for boid in boids:
@@ -122,23 +122,23 @@ def run(return_to_menu):
             buttons[4] = Button("Pause", text_color=GREEN)
             Text("PAUSE", WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, ORANGE, 70).Draw()
 
-        # Affichage des boutons
+        # Display buttons
         x_offset = 20
         for button in buttons[1:]:
             button.draw(x=x_offset, y=y_offset_bottom)
             x_offset += button.rect.width + margin
         buttons[0].draw(x=20, y=y_offset_top)
 
-        # Dessin des sliders
+        # Draw sliders
         for slider in sliders:
             slider.draw(bar_color=WHITE, cursor_color=ORANGE)
 
-        # Gestion des événements
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game()
 
-            # Gestion des sliders
+            # Slider handling
             for i, slider in enumerate(sliders):
                 if event.type == pygame.MOUSEBUTTONDOWN and slider.handle_event(event):
                     pass
@@ -151,33 +151,33 @@ def run(return_to_menu):
                         if i == 0:  # Cohesion
                             for boid in boids:
                                 boid.cohesion_slider = boid.vision * slider.current_val / 100
-                        elif i == 1:  # Alignement
+                        elif i == 1:  # Alignment
                             for boid in boids:
                                 boid.alignment_slider = boid.vision * slider.current_val / 100
-                        elif i == 2:  # Distance
+                        elif i == 2:  # Separation
                             for boid in boids:
                                 boid.separation_slider = boid.avoid_radius * slider.current_val / 100
                         elif i == 3:  # Max Speed
                             for boid in boids:
                                 boid.speed_slider = max(0.1, boid.max_speed * slider.current_val / 100)
 
-            # Gestion des boutons
+            # Button handling
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for i, button in enumerate(buttons):
                     if button.handle_event(event):
-                        if i == 0:  # Retour
+                        if i == 0:  # Back
                             return_to_menu()
                         elif i == 1:  # Reset
                             boids = [Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(nbBoids)]
-                        elif i == 2:  # Ajouter
-                            if len(boids) + 25 <= 100000:  # Limite arbitraire
+                        elif i == 2:  # Add
+                            if len(boids) + 25 <= 100000:  # Arbitrary limit
                                 boids.extend([Boid(rd.randint(0, WINDOW_WIDTH), rd.randint(0, WINDOW_HEIGHT)) for _ in range(25)])
-                        elif i == 3:  # Retirer
+                        elif i == 3:  # Remove
                             if len(boids) >= 25:
                                 del boids[-25:]
                         elif i == 4:  # Pause
                             running = not running
-                        elif i == 5:  # Grille
+                        elif i == 5:  # Grid
                             grid_active = not grid_active
                         elif i == 6:  # Zones
                             zone_on = not zone_on
@@ -186,9 +186,9 @@ def run(return_to_menu):
                 if event.key == pygame.K_ESCAPE:
                     return_to_menu()
 
-        # Affichage des FPS et du nombre de boids
+        # Display FPS and boid count
         Text(
-            f"~fps: {round(CLOCK.get_fps())}     ~Nombres de boids: {len(boids)}",
+            f"~fps: {round(CLOCK.get_fps())}     ~Number of boids: {len(boids)}",
             WINDOW_WIDTH // 2,
             30,
             color=ORANGE,
@@ -196,5 +196,5 @@ def run(return_to_menu):
         ).Draw()
 
         pygame.display.update()
-        CLOCK.tick_busy_loop(FPS)
+        CLOCK.tick(FPS)
 
